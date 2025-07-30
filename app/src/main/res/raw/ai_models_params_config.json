@@ -1,0 +1,54 @@
+{
+  "models": [
+    {
+      "name": "qwen3:32b-q8_0",
+      "model": "qwen3:32b-q8_0",
+      "family": "qwen3",
+      "params": {
+        "top_k": 20,
+        "temperature": "0.6",
+        "top_p": "0.95",
+        "min_p": "0",
+        "num_ctx": 10240
+      }
+    },
+    {
+      "name": "qwen3:30b-a3b-q8_0",
+      "model": "qwen3:30b-a3b-q8_0",
+      "family": "qwen3moe",
+      "params": {
+        "top_k": 20,
+        "temperature": "0.6",
+        "top_p": "0.95",
+        "min_p": "0",
+        "num_ctx": 10240
+      }
+    },
+    {
+      "name": "qwen3:30b-a3b-instruct-2507-q8_0",
+      "model": "qwen3:30b-a3b-instruct-2507-q8_0",
+      "family": "qwen3moe",
+      "params": {
+        "top_k": 20,
+        "temperature": "0.7",
+        "top_p": "0.8",
+        "min_p": "0",
+        "repeat_penalty": "1",
+        "num_ctx": 10240
+      }
+    },
+    {
+      "name": "qwen3:30b-a3b-thinking-2507-q8_0",
+      "model": "qwen3:30b-a3b-thinking-2507-q8_0",
+      "family": "qwen3moe",
+      "params": {
+        "top_k": 20,
+        "temperature": "0.6",
+        "top_p": "0.95",
+        "min_p": "0",
+        "repeat_penalty": "1",
+        "num_ctx": 16384
+      }
+    }
+  ]
+}

@@ -1,20 +1,48 @@
 [versions]
-agp = "8.10.0"
-kotlin = "2.0.21"
+agp = "8.11.1"
+kotlin = "2.2.0"
+kotlinSymbolProcessiong = "2.2.0-2.0.2"
 coreKtx = "1.16.0"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.0"
+lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
-composeBom = "2024.09.00"
+composeBom = "2025.07.00"
+materialIconExtended = "1.7.8"
+lifecycleViewModel = "2.9.2"
+kotlinxCoroutines = "1.10.2"
+timber = "5.0.1"
+splashScreen = "1.2.0-rc01"
+okHttp = "5.1.0"
+retrofit = "3.0.0"
+workManager = "2.10.2"
+
+#Navigation3
+nav3Core = "1.0.0-alpha05"
+lifecycleViewmodelNav3 = "1.0.0-alpha03"
+material3AdaptiveNav3 = "1.0.0-SNAPSHOT"
+
+#Serialization
+kotlinSerialization = "2.2.0"
+kotlinxSerializationCore = "1.9.0"
+
+#Room
+room = "2.7.2"
+
+#Langchain
+langchain4j = "1.2.0"
+langchain4jOllama = "1.2.0"
+langchain4jKotlin = "1.0.1-beta6"
+
+richtext = "1.0.0-alpha02"
+commonmark = "1.0.0-alpha02"
+
+detekt = "1.23.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewModel" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewModel" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -22,11 +50,52 @@ androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashScreen" }
+androidx-workmanager-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
+
+material-icon-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconExtended" }
+
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+
+langchain4j = { group = "dev.langchain4j", name = "langchain4j", version.ref = "langchain4j" }
+langchain4j-core = { group = "dev.langchain4j", name = "langchain4j-core", version.ref = "langchain4j" }
+langchain4j-kotlin = { group = "dev.langchain4j", name = "langchain4j-kotlin", version.ref = "langchain4jKotlin" }
+langchain4j-ollama = { group = "dev.langchain4j", name = "langchain4j-ollama", version.ref = "langchain4jOllama" }
+langchain4j-http-client = { group = "dev.langchain4j", name = "langchain4j-http-client", version.ref = "langchain4j" }
+langchain4j-http-client-jdk = { group = "dev.langchain4j", name = "langchain4j-http-client-jdk", version.ref = "langchain4j" }
+
+# Network
+squareup-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp" }
+squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+squareup-retrofit-converter-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
+
+# Navigation libraries
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
+androidx-material3-adaptive-navigation3 = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "material3AdaptiveNav3" }
+
+# Serialization
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationCore" }
+
+# Room
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+# Markdown
+commonmark = { group = "com.halilibo.compose-richtext", name = "richtext-commonmark", version.ref = "commonmark" }
+richtext = { group = "com.halilibo.compose-richtext", name = "richtext-ui-material3", version.ref = "richtext" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
+kotlinSymbolProcessiong = { id = "com.google.devtools.ksp", version.ref = "kotlinSymbolProcessiong" }
+androidx-room = { id = "androidx.room", version.ref = "room" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
