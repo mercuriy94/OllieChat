@@ -13,7 +13,7 @@ timber = "5.0.1"
 splashScreen = "1.2.0-rc01"
 okHttp = "5.1.0"
 retrofit = "3.0.0"
-workManager = "2.10.2"
+workManager = "2.10.3"
 
 #Navigation3
 nav3Core = "1.0.0-alpha05"
