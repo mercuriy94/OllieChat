@@ -75,16 +75,16 @@ internal class OllieChatMessageDbEntity(
     enum class StatusDb {
 
         // User
+        CREATED,
         SENDING,
         SENT,
 
         // Assistant
-        PROCESSING,
+        PENDING,
         PARTIAL,
         COMPLETED,
 
         // Common
-        PENDING,
         ERROR,
     }
 }

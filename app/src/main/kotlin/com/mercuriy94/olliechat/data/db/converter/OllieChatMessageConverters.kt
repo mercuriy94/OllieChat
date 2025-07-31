@@ -32,10 +32,10 @@ internal object OllieChatMessageAuthorDbEntityConverter {
 
 internal class OllieChatMessageStatusDbEntityConverter {
     private companion object {
+        const val CREATED = "CREATED"
         const val PENDING = "PENDING"
         const val SENDING = "SENDING"
         const val SENT = "SENT"
-        const val PROCESSING = "PROCESSING"
         const val PARTIAL = "PARTIAL"
         const val COMPLETED = "COMPLETED"
         const val ERROR = "ERROR"
@@ -44,10 +44,10 @@ internal class OllieChatMessageStatusDbEntityConverter {
     @TypeConverter
     fun toStatusDb(dbValue: String): StatusDb =
         when (dbValue) {
+            CREATED -> StatusDb.CREATED
             PENDING -> StatusDb.PENDING
             SENDING -> StatusDb.SENDING
             SENT -> StatusDb.SENT
-            PROCESSING -> StatusDb.PROCESSING
             PARTIAL -> StatusDb.PARTIAL
             COMPLETED -> StatusDb.COMPLETED
             ERROR -> StatusDb.ERROR
@@ -56,10 +56,10 @@ internal class OllieChatMessageStatusDbEntityConverter {
 
     @TypeConverter
     fun fromStatusDb(dbEntity: StatusDb): String = when (dbEntity) {
+        StatusDb.CREATED -> CREATED
         StatusDb.PENDING -> PENDING
         StatusDb.SENDING -> SENDING
         StatusDb.SENT -> SENT
-        StatusDb.PROCESSING -> PROCESSING
         StatusDb.PARTIAL -> PARTIAL
         StatusDb.COMPLETED -> COMPLETED
         StatusDb.ERROR -> ERROR

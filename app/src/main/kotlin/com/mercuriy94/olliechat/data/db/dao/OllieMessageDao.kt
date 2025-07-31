@@ -44,12 +44,12 @@ internal interface OllieMessageDao {
     @Query(
         "SELECT * FROM ollie_messages " +
                 "WHERE chat_id = :chatId " +
-                "AND status in (:finishedStatuses) " +
+                "AND status NOT IN (:skipStatuses) " +
                 "ORDER BY datetime(created_at) "
     )
     fun observeFinishedChatMessages(
         chatId: Long,
-        finishedStatuses: List<StatusDb> = listOf(StatusDb.SENT, StatusDb.COMPLETED, StatusDb.ERROR),
+        skipStatuses: List<StatusDb> = listOf(StatusDb.PARTIAL, StatusDb.PENDING),
     ): Flow<List<OllieChatMessageDbEntityWithRelationships>>
 
     @Query("SELECT * FROM ollie_messages WHERE chat_id = :chatId AND id = :messageId")

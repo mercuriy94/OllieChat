@@ -31,7 +31,7 @@ internal class OllieChatMessageDbToDomainEntityMapper {
             text = message.text,
             createdAt = message.createdAt,
             status = when (message.status) {
-                StatusDb.PENDING -> UserMessageEntity.Status.PENDING
+                StatusDb.CREATED -> UserMessageEntity.Status.CREATED
                 StatusDb.ERROR -> UserMessageEntity.Status.ERROR
                 StatusDb.SENDING -> UserMessageEntity.Status.SENDING
                 StatusDb.SENT -> UserMessageEntity.Status.SENT
@@ -48,7 +48,6 @@ internal class OllieChatMessageDbToDomainEntityMapper {
             text = message.text,
             createdAt = message.createdAt,
             status = when (message.status) {
-                StatusDb.PROCESSING -> AssistantMessageEntity.Status.PROCESSING
                 StatusDb.PARTIAL -> AssistantMessageEntity.Status.PARTIAL
                 StatusDb.COMPLETED -> AssistantMessageEntity.Status.COMPLETED
                 StatusDb.PENDING -> AssistantMessageEntity.Status.PENDING

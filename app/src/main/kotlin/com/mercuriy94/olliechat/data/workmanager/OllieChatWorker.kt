@@ -41,7 +41,7 @@ internal class OllieChatWorker(
     private val coroutineDispatchers = CoroutineDispatchersModule.coroutineDispatchers
     private val messageRepository = OllieChatDataModule.ollieMessageRepository
     private val chatWorksRepository = OllieChatDataModule.ollieChatWorksRepository
-    private val chatWorkProgressManager = OllieChatDataModule.chatWorkProgressManager
+    private val streamingChatWorkManager = OllieChatDataModule.streamingChatWorkManager
     private val ollieChatManager = OllieChatDataModule.ollieChatManager
 
     override suspend fun doWork(): Result {
@@ -60,16 +60,22 @@ internal class OllieChatWorker(
                         val userMessageId = requireNotNull(task.userMessageId) {
                             "userMessageId must be not null"
                         }
+                        val assistantMessageId = requireNotNull(task.assistantMessageId) {
+                            "assistantMessageId must be not null"
+                        }
                         val modelId = task.modelId
-                        doChat(chatId = chatId, userMessageId = userMessageId, modelId = modelId)
+                        doChat(
+                            chatId = chatId,
+                            userMessageId = userMessageId,
+                            assistantMessageId = assistantMessageId,
+                            modelId = modelId
+                        )
                     }
 
                     TypeDbEntity.GENERATE_TITLE -> {
                         generateTitle(chatId = chatId, modelId = task.modelId)
                     }
                 }
-            }.onSuccess {
-                chatWorksRepository.deleteWork(workRequestId = id.toString())
             }.getOrElse { e ->
                 Timber.tag(TAG).d("catch: cause = $e")
                 Result.failure()
@@ -77,17 +83,20 @@ internal class OllieChatWorker(
         }
     }
 
-    private suspend fun doChat(chatId: Long, userMessageId: Long, modelId: Long): Result {
+    private suspend fun doChat(chatId: Long, userMessageId: Long, assistantMessageId: Long, modelId: Long): Result {
         return withContext(coroutineDispatchers.io) {
-            Timber.tag(TAG)
-                .d("Start with params: chatId = $chatId, userMessageId = $userMessageId, modelId = $modelId")
+            Timber.tag(TAG).d("Start with params: chatId = $chatId, userMessageId = $userMessageId, modelId = $modelId")
 
             var previousPartialResponseBatchReadyTime = System.currentTimeMillis()
             var isFirstBatchGot = false
 
             val responseText = StringBuilder()
             ollieChatManager.getChatById(chatId)
-                .sendMessage(messageId = userMessageId, aiModelId = modelId)
+                .sendMessage(
+                    userMessageId = userMessageId,
+                    assistantMessageId = assistantMessageId,
+                    aiModelId = modelId
+                )
                 .onEach { reply ->
                     when (reply) {
                         is CompleteResponse -> {
@@ -110,7 +119,7 @@ internal class OllieChatWorker(
                         is PartialResponse -> {
                             Timber.tag(TAG).d("PartialResponse: ${reply.partialResponse}")
                             responseText.append(reply.partialResponse)
-                            chatWorkProgressManager.getOrCreateChatProgressFlow(id.toString())
+                            streamingChatWorkManager.getOrCreateStreamingChatFlow(id.toString())
                                 .emit(
                                     OllieChatWorkPartialResponse(
                                         aiMessageId = reply.aiMessageId,
@@ -120,7 +129,11 @@ internal class OllieChatWorker(
                         }
                     }
                 }
-                .onCompletion { cause -> Timber.tag(TAG).d("onCompletion: cause = $cause") }
+                .onCompletion { cause ->
+                    Timber.tag(TAG).d("onCompletion: cause = $cause")
+                    chatWorksRepository.deleteWork(workRequestId = id.toString())
+                    streamingChatWorkManager.removeStreamingChatFlow(workRequestId = id.toString())
+                }
                 .filterIsInstance<PartialResponse>()
                 .chunkPartialResponse()
                 .onEach { response ->
@@ -169,9 +182,15 @@ internal class OllieChatWorker(
     }
 
     private suspend fun generateTitle(chatId: Long, modelId: Long): Result {
-        return withContext(coroutineDispatchers.io) {
-            ollieChatManager.getChatById(chatId).generateTitle(modelId)
-            Result.success()
+        return runSuspendCatching {
+            withContext(coroutineDispatchers.io) {
+                ollieChatManager.getChatById(chatId).generateTitle(modelId)
+                chatWorksRepository.deleteWork(workRequestId = id.toString())
+                Result.success()
+            }
+        }.getOrElse { throwable ->
+            Timber.tag(TAG).e(throwable, "Couldn't generate title")
+            Result.failure()
         }
     }
 }

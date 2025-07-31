@@ -5,7 +5,6 @@ import com.mercuriy94.olliechat.data.repository.chat.OllieChatImpl
 import com.mercuriy94.olliechat.data.repository.chat.title.TitleGenerator
 import com.mercuriy94.olliechat.domain.repository.chat.OllieChatRepository
 import com.mercuriy94.olliechat.domain.repository.chat.OllieMessageRepository
-import com.mercuriy94.olliechat.domain.repository.model.OllieModelRepository
 
 internal interface OllieChatManager {
 
@@ -15,7 +14,6 @@ internal interface OllieChatManager {
 internal class OllieChatManagerImpl(
     private val ollieChatAssistantManager: OllieChatAssistantManager,
     private val persistentOllieChatRepository: OllieChatRepository,
-    private val modelRepository: OllieModelRepository,
     private val messageRepository: OllieMessageRepository,
     private val olleChatTitleGenerator: TitleGenerator,
 ) : OllieChatManager {
@@ -25,7 +23,6 @@ internal class OllieChatManagerImpl(
             chatId = persistentOllieChatRepository.getChatById(id).id,
             ollieChatAssistantManager = ollieChatAssistantManager,
             chatRepository = persistentOllieChatRepository,
-            modelRepository = modelRepository,
             titleGenerator = olleChatTitleGenerator,
             messageRepository = messageRepository,
         )

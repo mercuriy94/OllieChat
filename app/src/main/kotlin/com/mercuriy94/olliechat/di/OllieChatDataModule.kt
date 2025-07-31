@@ -22,8 +22,8 @@ import com.mercuriy94.olliechat.data.repository.chat.memory.PersistentOllieChatM
 import com.mercuriy94.olliechat.data.repository.chat.title.TitleGenerator
 import com.mercuriy94.olliechat.data.repository.config.AiModelsParamsConfigRepositoryImpl
 import com.mercuriy94.olliechat.data.repository.model.OllieModelRepositoryImpl
-import com.mercuriy94.olliechat.data.repository.work.OllieChatWorkProgressManager
 import com.mercuriy94.olliechat.data.repository.work.OllieChatWorksRepository
+import com.mercuriy94.olliechat.data.repository.work.OllieStreamingChatWorkManager
 import com.mercuriy94.olliechat.di.langchain4j.Langchain4jModule
 import com.mercuriy94.olliechat.domain.repository.chat.OllieChatRepository
 import com.mercuriy94.olliechat.domain.repository.chat.OllieMessageRepository
@@ -131,7 +131,6 @@ internal object OllieChatDataModule {
         OllieChatManagerImpl(
             ollieChatAssistantManager = ollieChatAssistantManager,
             persistentOllieChatRepository = ollieChatRepository,
-            modelRepository = ollieModelRepository,
             messageRepository = ollieMessageRepository,
             olleChatTitleGenerator = TitleGenerator(
                 okHttpClient = NetworkModule.okHttpClient,
@@ -143,7 +142,7 @@ internal object OllieChatDataModule {
         )
     }
 
-    val chatWorkProgressManager: OllieChatWorkProgressManager by lazy(NONE) {
-        OllieChatWorkProgressManager()
+    val streamingChatWorkManager: OllieStreamingChatWorkManager by lazy(NONE) {
+        OllieStreamingChatWorkManager()
     }
 }
