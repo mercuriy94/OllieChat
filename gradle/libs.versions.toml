@@ -16,8 +16,8 @@ retrofit = "3.0.0"
 workManager = "2.10.3"
 
 #Navigation3
-nav3Core = "1.0.0-alpha05"
-lifecycleViewmodelNav3 = "1.0.0-alpha03"
+nav3Core = "1.0.0-alpha06"
+lifecycleViewmodelNav3 = "1.0.0-alpha04"
 material3AdaptiveNav3 = "1.0.0-SNAPSHOT"
 
 #Serialization
