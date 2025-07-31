@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.OllieChat" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.OllieChat.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.OllieChat</item>
+    </style>
 </resources>
