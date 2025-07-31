@@ -62,7 +62,6 @@ internal class OllieChatMessageDomainToDbEntityMapper {
     fun mapDomainStatusToDbStatus(status: AssistantMessageEntity.Status): StatusDb {
         return when (status) {
             AssistantMessageEntity.Status.PENDING -> StatusDb.PENDING
-            AssistantMessageEntity.Status.PROCESSING -> StatusDb.PROCESSING
             AssistantMessageEntity.Status.PARTIAL -> StatusDb.PARTIAL
             AssistantMessageEntity.Status.COMPLETED -> StatusDb.COMPLETED
             AssistantMessageEntity.Status.ERROR -> StatusDb.ERROR
@@ -71,7 +70,7 @@ internal class OllieChatMessageDomainToDbEntityMapper {
 
     fun mapDomainStatusToDbStatus(status: UserMessageEntity.Status): StatusDb {
         return when (status) {
-            UserMessageEntity.Status.PENDING -> StatusDb.PENDING
+            UserMessageEntity.Status.CREATED -> StatusDb.CREATED
             UserMessageEntity.Status.SENDING -> StatusDb.SENDING
             UserMessageEntity.Status.SENT -> StatusDb.SENT
             UserMessageEntity.Status.ERROR -> StatusDb.ERROR

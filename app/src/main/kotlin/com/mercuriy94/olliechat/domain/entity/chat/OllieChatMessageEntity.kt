@@ -14,7 +14,7 @@ internal sealed interface OllieChatMessageEntity {
     ) : OllieChatMessageEntity {
 
         enum class Status {
-            PENDING,
+            CREATED,
             SENDING,
             SENT,
             ERROR,
@@ -34,7 +34,6 @@ internal sealed interface OllieChatMessageEntity {
         enum class Status {
 
             PENDING,
-            PROCESSING,
             PARTIAL,
             COMPLETED,
             ERROR,

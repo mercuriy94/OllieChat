@@ -11,13 +11,14 @@ import com.mercuriy94.olliechat.data.db.model.OllieChatWorkDbEntity
 import com.mercuriy94.olliechat.data.db.model.OllieChatWorkTaskDbEntity
 import com.mercuriy94.olliechat.data.db.model.OllieChatWorkTaskDbEntity.TypeDbEntity
 import com.mercuriy94.olliechat.data.repository.work.OllieChatWorkPartialResponse
-import com.mercuriy94.olliechat.data.repository.work.OllieChatWorkProgressManager
 import com.mercuriy94.olliechat.data.repository.work.OllieChatWorksRepository
+import com.mercuriy94.olliechat.data.repository.work.OllieStreamingChatWorkManager
 import com.mercuriy94.olliechat.data.workmanager.OllieChatWorker
 import com.mercuriy94.olliechat.domain.entity.chat.OllieChatMessageEntity
 import com.mercuriy94.olliechat.domain.entity.chat.OllieChatMessageEntity.AssistantMessageEntity
 import com.mercuriy94.olliechat.domain.repository.chat.OllieChatRepository
 import com.mercuriy94.olliechat.domain.repository.chat.OllieMessageRepository
+import com.mercuriy94.olliechat.domain.repository.model.OllieModelRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -33,7 +34,8 @@ internal class OllieChatWorkManager(
     private val chatRepository: OllieChatRepository,
     private val messageRepository: OllieMessageRepository,
     private val chatWorksRepository: OllieChatWorksRepository,
-    private val chatWorkProgressManager: OllieChatWorkProgressManager,
+    private val modelRepository: OllieModelRepository,
+    private val streamingChatWorkManager: OllieStreamingChatWorkManager,
     private val workManager: WorkManager,
 ) {
     companion object {
@@ -86,18 +88,49 @@ internal class OllieChatWorkManager(
                 } else {
                     flow {
                         val flow = works.map { (work, _) -> UUID.fromString(work.workRequestId) }
-                            .let { workRequestIds -> workManager.getWorkInfosFlow(WorkQuery.fromIds(workRequestIds)) }
+                            .let { workRequestIds ->
+                                workManager.getWorkInfosFlow(WorkQuery.fromIds(workRequestIds))
+                            }
                             .map { workInfos ->
                                 workInfos
-                                    .filter { workInfo -> !workInfo.state.isFinished }
+                                    .filter { workInfo ->
+                                        workInfos.forEach { workInfo ->
+                                            Timber.tag(TAG).d("observeActiveStreamingChats: workInfo = $workInfo")
+                                        }
+                                        !workInfo.state.isFinished
+                                    }
                                     .map { workInfo ->
-                                        chatWorkProgressManager.getOrCreateChatProgressFlow(
-                                            workRequestId = workInfo.id.toString()
-                                        )
+
+                                        flow {
+                                            val partialResponse =
+                                                chatWorksRepository.getWorkByRequestId(workInfo.id.toString())
+                                                    ?.let { (_, task) ->
+                                                        task.assistantMessageId.takeIf {
+                                                            task.type == TypeDbEntity.DO_CHAT
+                                                        }
+                                                    }?.let { assistantMessageId ->
+                                                        messageRepository.getMessageById(chatId, assistantMessageId)
+                                                    }?.let { message ->
+                                                        if (message is AssistantMessageEntity) {
+                                                            OllieChatWorkPartialResponse(
+                                                                aiMessageId = message.id,
+                                                                partialResponse = message.text
+                                                            )
+                                                        } else null
+                                                    }
+
+                                            if (partialResponse != null) {
+                                                emit(partialResponse)
+                                            }
+                                            emitAll(
+                                                streamingChatWorkManager.getOrCreateStreamingChatFlow(
+                                                    workInfo.id.toString()
+                                                )
+                                            )
+                                        }
                                     }
                             }.flatMapLatest { workInfos ->
-                                Timber.tag(TAG)
-                                    .d("observeActiveStreamingChats: works running: ${works.size}")
+                                Timber.tag(TAG).d("observeActiveStreamingChats: works running: ${works.size}")
                                 if (workInfos.isEmpty()) {
                                     flowOf(emptyList())
                                 } else {
@@ -107,9 +140,9 @@ internal class OllieChatWorkManager(
                         emitAll(flow)
                     }
                 }
-
             }
     }
+
 
     suspend fun doChat(
         chatId: Long,
@@ -124,11 +157,21 @@ internal class OllieChatWorkManager(
             .build()
 
         val workRequest = OneTimeWorkRequestBuilder<OllieChatWorker>()
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setExpedited(policy = OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setId(workRequestId)
             .addTag("App_Chat_Worker")
             .setConstraints(constraints)
             .build()
+
+        val model = requireNotNull(modelRepository.getModelById(aiModelId)) {
+            "Couldn't find model with id = $aiModelId!"
+        }
+
+        val assistantMessageId = messageRepository.saveNewAssistantMessage(
+            chatId = chatId,
+            userMessageId = userMessageId,
+            AssistantMessageEntity.AiModel(aiModelId = aiModelId, name = model.name)
+        )
 
         chatWorksRepository.saveWork(
             OllieChatWorkDbEntity(
@@ -139,6 +182,7 @@ internal class OllieChatWorkManager(
             OllieChatWorkTaskDbEntity(
                 modelId = aiModelId,
                 userMessageId = userMessageId,
+                assistantMessageId = assistantMessageId,
                 type = TypeDbEntity.DO_CHAT,
             )
         )

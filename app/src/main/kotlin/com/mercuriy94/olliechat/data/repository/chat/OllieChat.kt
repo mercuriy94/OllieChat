@@ -11,7 +11,6 @@ import com.mercuriy94.olliechat.domain.entity.chat.OllieChatMessageEntity.UserMe
 import com.mercuriy94.olliechat.domain.entity.chat.OllieChatMessageStreamingReply
 import com.mercuriy94.olliechat.domain.repository.chat.OllieChatRepository
 import com.mercuriy94.olliechat.domain.repository.chat.OllieMessageRepository
-import com.mercuriy94.olliechat.domain.repository.model.OllieModelRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -27,7 +26,8 @@ internal interface OllieChat {
     ): OllieChatMessageEntity?
 
     fun sendMessage(
-        messageId: Long,
+        userMessageId: Long,
+        assistantMessageId: Long,
         aiModelId: Long,
     ): Flow<OllieChatMessageStreamingReply>
 
@@ -38,7 +38,6 @@ internal class OllieChatImpl(
     override val chatId: Long,
     private val chatRepository: OllieChatRepository,
     private val messageRepository: OllieMessageRepository,
-    private val modelRepository: OllieModelRepository,
     private val titleGenerator: TitleGenerator,
     ollieChatAssistantManager: OllieChatAssistantManager,
 ) : OllieChat {
@@ -53,13 +52,17 @@ internal class OllieChatImpl(
     }
 
     override fun sendMessage(
-        messageId: Long,
+        userMessageId: Long,
+        assistantMessageId: Long,
         aiModelId: Long,
     ): Flow<OllieChatMessageStreamingReply> {
         return flow {
-            val chatMemoryId = createMemoryChatId(userMessageId = messageId, aiModelId = aiModelId)
-            val message = requireNotNull(getMessageById(messageId)) {
-                "Couldn't find message with id = $messageId!"
+            val chatMemoryId = createMemoryChatId(
+                userMessageId = userMessageId,
+                assistantMessageId = assistantMessageId
+            )
+            val message = requireNotNull(getMessageById(userMessageId)) {
+                "Couldn't find message with id = $userMessageId!"
             }
             val text = when (message) {
                 is UserMessageEntity -> message.text
@@ -82,24 +85,14 @@ internal class OllieChatImpl(
     }
 
 
-    private suspend fun createMemoryChatId(
+    private fun createMemoryChatId(
+        assistantMessageId: Long,
         userMessageId: Long,
-        aiModelId: Long,
     ): OllieChatMemoryId {
-        val model = requireNotNull(modelRepository.getModelById(aiModelId)) {
-            "Couldn't find model with id = $aiModelId!"
-        }
         return OllieChatMemoryId(
             chatId = chatId,
             userMessageId = userMessageId,
-            assistantMessageId = messageRepository.saveNewAssistantMessage(
-                chatId = chatId,
-                userMessageId = userMessageId,
-                AssistantMessageEntity.AiModel(
-                    aiModelId = model.id,
-                    name = model.name,
-                )
-            ),
+            assistantMessageId = assistantMessageId,
         )
     }
 }

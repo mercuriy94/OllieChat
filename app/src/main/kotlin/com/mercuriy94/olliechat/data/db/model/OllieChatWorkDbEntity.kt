@@ -65,6 +65,9 @@ internal data class OllieChatWorkTaskDbEntity(
 
     @ColumnInfo(name = "user_message_id")
     val userMessageId: Long? = null,
+
+    @ColumnInfo(name = "assistant_message_id")
+    val assistantMessageId: Long? = null,
 ) {
 
     enum class TypeDbEntity {

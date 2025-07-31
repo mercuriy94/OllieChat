@@ -36,7 +36,7 @@ internal class PersistentOllieMessageRepositoryImpl(
                     text = text,
                     chatId = chatId,
                     author = AuthorDb.USER,
-                    status = StatusDb.PENDING,
+                    status = StatusDb.CREATED,
                     createdAt = OffsetDateTime.now()
                 )
             )

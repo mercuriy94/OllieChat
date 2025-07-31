@@ -79,7 +79,8 @@ internal class ChatViewModel(
                         messageRepository = OllieChatDataModule.ollieMessageRepository,
                         chatWorksRepository = OllieChatDataModule.ollieChatWorksRepository,
                         workManager = WorkManager.getInstance(context = OllieChatApplication.context),
-                        chatWorkProgressManager = OllieChatDataModule.chatWorkProgressManager,
+                        streamingChatWorkManager = OllieChatDataModule.streamingChatWorkManager,
+                        modelRepository = OllieChatDataModule.ollieModelRepository,
                     ),
                     messageDomainToChatUiEntityMapper = OllieChatMessageDomainToChatUiEntityMapper(),
                 )
@@ -125,6 +126,10 @@ internal class ChatViewModel(
                 .mapLatest { activeStreamingChats ->
                     if (activeStreamingChats.isNotEmpty()) {
                         activeStreamingChats.forEach { activeStreamingChat ->
+                            if (activeStreamingChat.partialResponse.isBlank()) {
+                                _uiState.update { state -> state.copy(inProgress = true) }
+                                return@forEach
+                            }
                             val updatedMessages =
                                 _uiState.value.messages.toMutableList().also { updatedMessages ->
                                     val (think, response) = messageDomainToChatUiEntityMapper.parseMessageText(
